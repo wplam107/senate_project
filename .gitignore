@@ -133,3 +133,6 @@ config.ini
 
 # pickles
 *.p
+
+# VSCode files
+/.vscode
