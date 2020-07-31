@@ -134,5 +134,8 @@ config.ini
 # pickles
 *.p
 
+# csv files
+*.csv
+
 # VSCode files
 /.vscode
