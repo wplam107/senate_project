@@ -139,3 +139,6 @@ config.ini
 
 # VSCode files
 /.vscode
+
+# txt log files
+*.txt
