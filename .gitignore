@@ -140,5 +140,8 @@ config.ini
 # VSCode files
 /.vscode
 
-# txt log files
-*.txt
+# txt log and requirements files for ec2
+/ec2/*.txt
+
+# Private keys
+*.pem
