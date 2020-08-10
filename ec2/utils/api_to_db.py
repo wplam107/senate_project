@@ -195,7 +195,7 @@ if __name__ == '__main__':
     conn.close()
 
     # Write update date to file
-    f = open('recent_update.txt', 'a')
+    f = open('../recent_update.txt', 'a')
     f.write(f'Date: {datetime.date(datetime.now())}, Update: {update}, New Senators: {update_sen}\n')
     f.close()
 
