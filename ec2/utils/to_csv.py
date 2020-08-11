@@ -202,6 +202,8 @@ if __name__ == '__main__':
         
     sen_length = pd.Series(sen_length)
     sen_length.name = 'voting_length'
+    df_sl = pd.DataFrame(list(df_current.index), columns=['name']).join(sen_length)
+    df_sl.set_index('name', inplace=True)
 
     # 2 component dimensionality
     pca = PCA(2)
@@ -233,12 +235,9 @@ if __name__ == '__main__':
     df_plot.drop('Kelly Loeffler', inplace=True) # Replace in future
     df_plot.loc['Richard Shelby']['party'] = 'R'
 
-    # Merge x, y data
-    df_plot = df_plot.join(df_xy, on='name').join(df_lbs, on='name')
+    # Merge DataFrames
+    df_plot = df_plot.join(df_xy, on='name').join(df_lbs, on='name').join(df_sl, on='name')
     df_plot.reset_index(inplace=True)
-
-    # Merge length of voting record
-    df_plot = df_plot.join(sen_length)
 
     # Create cluster names
     df_plot['cluster'] = np.nan
