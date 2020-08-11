@@ -19,7 +19,10 @@ def sen_by_q(senator_info, party=None, gender=None, state=None):
         
     for senator in senator_info:
         sen_name = f'{senator[1]} {senator[2]}'
-        sen_party = senator[3]
+        if sen_name == 'Richard Shelby':
+            sen_party = 'R'
+        else:
+            sen_party = senator[3]
         sen_gender = senator[4]
         sen_state = senator[5]
         if state == None:

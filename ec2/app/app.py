@@ -68,7 +68,8 @@ app.layout = html.Div(children=[
                             options=[ {'label': state, 'value': state} for state in states ],
                             multi=True,
                             disabled=False,
-                            placeholder='Select State(s)'
+                            placeholder='Select State(s)',
+                            clearable=False
                         ),
                         dcc.RadioItems(
                             id='disable-gender',
@@ -84,7 +85,8 @@ app.layout = html.Div(children=[
                             options=[ {'label': gender, 'value': gender} for gender in genders ],
                             multi=True,
                             disabled=False,
-                            placeholder='Select Gender(s)'
+                            placeholder='Select Gender(s)',
+                            clearable=False
                         ),
                         dcc.RadioItems(
                             id='disable-party',
@@ -100,7 +102,8 @@ app.layout = html.Div(children=[
                             options=[ {'label': party, 'value': party} for party in parties ],
                             multi=True,
                             disabled=False,
-                            placeholder='Select Party/Parties'
+                            placeholder='Select Party/Parties',
+                            clearable=False
                         ),
                     ], className='six columns'),
                     html.Div(dcc.Graph(id='pca-plot'), className='six columns')
@@ -146,8 +149,17 @@ def pca_state_disable(value):
     Output('pca-plot', 'figure'),
     [Input('state-pca', 'value'),
     Input('gender-pca', 'value'),
-    Input('party-pca', 'value')])
-def update_pca_plot(state, gender, party):
+    Input('party-pca', 'value'),
+    Input('disable-state', 'value'),
+    Input('disable-gender', 'value'),
+    Input('disable-party', 'value')])
+def update_pca_plot(state, gender, party, s, g, p):
+    if s == 'disable':
+        state = states
+    if g == 'disable':
+        gender = genders
+    if p == 'disable':
+        party = parties
     return pca_plot(data_df, sen_info, state=state, gender=gender, party=party)
     
 
