@@ -1,0 +1,8 @@
+numpy
+pandas
+plotly
+dash
+gunicorn
+Flask
+Jinja2
+Werkzeug

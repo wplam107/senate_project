@@ -14,6 +14,7 @@ from functions import *
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 sim_df = pd.read_csv('data/voting_sim.csv', index_col=0)
 cur_sim_df = pd.read_csv('data/vs_current.csv', index_col=0)
@@ -28,6 +29,40 @@ genders = list(set([ sen[4] for sen in sen_info ]))
 genders.sort()
 parties = list(set([ sen[3] for sen in sen_info ]))
 parties.sort()
+
+# Loading figure
+loading_fig = go.Figure(go.Scatter())
+loading_fig.update_layout(
+    xaxis={'visible': False},
+    yaxis={'visible': False},
+    annotations=[
+        {
+            "text": "Loading",
+            "xref": "paper",
+            "yref": "paper",
+            "showarrow": False,
+            "font": {"size": 28}
+        }
+    ]
+)
+
+# No selection made figure
+no_fig = go.Figure(go.Scatter())
+no_fig.update_layout(
+    xaxis={'visible': False},
+    yaxis={'visible': False},
+    annotations=[
+        {
+            "text": "No Senator Selected",
+            "xref": "paper",
+            "yref": "paper",
+            "showarrow": False,
+            "font": {"size": 28}
+        }
+    ],
+    width=600,
+    height=400
+)
 
 app.layout = html.Div(children=[
     html.H1(children=[
@@ -106,13 +141,60 @@ app.layout = html.Div(children=[
                             clearable=False
                         ),
                     ], className='six columns'),
-                    html.Div(dcc.Graph(id='pca-plot'), className='six columns')
+                    html.Div(dcc.Graph(id='pca-plot', figure=loading_fig), className='six columns')
                 ], className='row')
             ])
         ]),
         dcc.Tab(label='Senator Similarities', children=[
             html.Div([
-                html.H3('Tab content 2')
+                html.H3('Most and Least Similar'),
+                html.Div(children=[
+                    html.Div(children=[
+                        dcc.Markdown(
+                            '''
+                            For a selected senator, the plots to the right illustrate the Top 10 most similar senators
+                            and Bottom 10 least similar senators based on voting agreement of the current Congress.
+                            Senators may be filtered by state, gender, and party.
+                            '''
+                        ),
+                        html.Div(children=[
+                            html.Div(dcc.Dropdown(
+                                id='state-sim',
+                                options=[ {'label': state, 'value': state} for state in states ],
+                                placeholder='Filter State',
+                                value=None
+                            ), style={'width': '33%', 'display': 'inline-block'}),
+                            html.Div(dcc.Dropdown(
+                                id='gender-sim',
+                                options=[ {'label': gender, 'value': gender} for gender in genders ],
+                                placeholder='Filter Gender',
+                                value=None
+                            ), style={'width': '33%', 'display': 'inline-block'}),
+                            html.Div(dcc.Dropdown(
+                                id='party-sim',
+                                options=[ {'label': party, 'value': party} for party in parties ],
+                                placeholder='Filter Party',
+                                value=None
+                            ), style={'width': '33%', 'display': 'inline-block'}),
+                            html.Div(dcc.Dropdown(
+                                id='sen-select',
+                                options=[ {'label': sen, 'value': sen} for sen in sen_by_q(sen_info) ],
+                                placeholder='Select Senator',
+                                value=None
+                            ), style={'width': '99%'})
+                        ]),
+                    ]),
+                    html.Div(children=[
+                        html.Div(dcc.Graph(
+                            id='most-similar',
+                            figure=no_fig
+                        ), className='six columns'),
+                        html.Div(dcc.Graph(
+                            id='least-similar',
+                            figure=no_fig
+                        ), className='six columns')
+                    ]),
+                ])
             ])
         ])
     ]),
@@ -161,7 +243,30 @@ def update_pca_plot(state, gender, party, s, g, p):
     if p == 'disable':
         party = parties
     return pca_plot(data_df, sen_info, state=state, gender=gender, party=party)
-    
+
+@app.callback(
+    Output('sen-select', 'options'),
+    [Input('state-sim', 'value'),
+    Input('gender-sim', 'value'),
+    Input('party-sim', 'value')])
+def update_sen_select(state, gender, party):
+    if state == None and gender == None and party == None:
+        return [ {'label': sen, 'value': sen} for sen in sen_by_q(sen_info) ]
+    else:
+        return [ {'label': sen, 'value': sen} for sen in sen_by_q(sen_info, state=state, gender=gender, party=party) ]
+
+@app.callback(
+    [Output('least-similar', 'figure'),
+    Output('most-similar', 'figure')],
+    [Input('sen-select', 'value')])
+def update_sim_plots(senator):
+    if senator == None:
+        return no_fig, no_fig
+    else:
+        least_sim, most_sim = sim_plot(cur_sim_df, senator)
+        least_sim.update_layout(width=600, height=400)
+        most_sim.update_layout(width=600, height=400)
+        return least_sim, most_sim
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()

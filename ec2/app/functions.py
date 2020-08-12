@@ -21,6 +21,8 @@ def sen_by_q(senator_info, party=None, gender=None, state=None):
         sen_name = f'{senator[1]} {senator[2]}'
         if sen_name == 'Richard Shelby':
             sen_party = 'R'
+        if sen_name == 'Kelly Loeffler':
+            continue
         else:
             sen_party = senator[3]
         sen_gender = senator[4]
@@ -59,7 +61,7 @@ def pca_plot(df, sen_info, party=None, gender=None, state=None):
         color='party',
         hover_name='name',
         hover_data=['party', 'state'],
-        color_discrete_map={'R': 'red', 'D': 'blue', 'ID': 'light green'},
+        color_discrete_map={'R': 'red', 'D': 'blue', 'ID': 'lightseagreen'},
         size='voting_length',
         symbol='cluster',
         range_x=(-11,11),
