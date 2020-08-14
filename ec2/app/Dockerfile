@@ -12,6 +12,5 @@ ADD . /opt/app/
 WORKDIR /opt/app
 
 
-# Run the app.  CMD is required to run on Heroku
-# $PORT is set by Heroku			
+# Run the app.  CMD is required to run on Heroku			
 CMD ["gunicorn", "app:server"]

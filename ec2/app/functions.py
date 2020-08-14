@@ -19,10 +19,10 @@ def sen_by_q(senator_info, party=None, gender=None, state=None):
         
     for senator in senator_info:
         sen_name = f'{senator[1]} {senator[2]}'
-        if sen_name == 'Richard Shelby':
-            sen_party = 'R'
         if sen_name == 'Kelly Loeffler':
             continue
+        if sen_name == 'Richard Shelby':
+            sen_party = 'R'
         else:
             sen_party = senator[3]
         sen_gender = senator[4]
@@ -35,6 +35,7 @@ def sen_by_q(senator_info, party=None, gender=None, state=None):
                 state = [state]
             if sen_party in party and sen_gender in gender and sen_state in state:
                 senators.append(sen_name)
+    senators.sort()
     return senators
 
 # Function for selected senator similarity
@@ -60,12 +61,10 @@ def pca_plot(df, sen_info, party=None, gender=None, state=None):
         y='y',
         color='party',
         hover_name='name',
-        hover_data=['party', 'state'],
+        hover_data={'party': True, 'state': True, 'x': False, 'y': False, 'cluster': True, 'voting_length': True},
         color_discrete_map={'R': 'red', 'D': 'blue', 'ID': 'lightseagreen'},
         size='voting_length',
         symbol='cluster',
-        range_x=(-11,11),
-        range_y=(-6, 14)
     )
     return fig
 
