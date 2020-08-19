@@ -5,6 +5,8 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from datetime import datetime
 
+import pickle
+
 # Set up connection to AWS RDS
 config1 = configparser.ConfigParser()
 config1.read('../config.ini')
@@ -35,6 +37,7 @@ if __name__ == '__main__':
         """
     )
     last_bill = cursor.fetchall()[-1]
+    print(last_bill)
 
     # Fetch list of senators in database
     cursor.execute(
@@ -56,10 +59,12 @@ if __name__ == '__main__':
     )
     votes = r.json()['results']['votes']
     most_recent = (votes[0]['congress'], votes[0]['session'], votes[0]['roll_call'])
+    print(most_recent)
 
     # Determine if there are new votes
     if most_recent != last_bill:
         update = True
+        print(update)
         rcs_to_pull = []
         for vote in votes:
             congress = vote['congress']
@@ -69,6 +74,7 @@ if __name__ == '__main__':
                 break # Stop when last_bill is reached
             else:
                 rcs_to_pull.append((congress, session, rc))
+        print(rcs_to_pull)
 
         # Make API calls
         list_of_bills = []
@@ -101,9 +107,10 @@ if __name__ == '__main__':
                         session,
                         roll_call,
                         item['bill']['bill_id'],
-                        vote['date']
+                        item['vote']['date']
                     )
                     bill_to_db.append(bill_tup)
+                    print(bill_tup)
 
                     for position in item['positions']:
                         vote_tup = (
@@ -195,8 +202,11 @@ if __name__ == '__main__':
     conn.close()
 
     # Write update date to file
-    f = open('../recent_update.txt', 'a')
-    f.write(f'Date: {datetime.date(datetime.now())}, Update: {update}, New Senators: {update_sen}\n')
-    f.close()
+    # f = open('./logs/recent_update.txt', 'a')
+    # f.write(f'Date: {datetime.date(datetime.now())}, Update: {update}, New Senators: {update_sen}\n')
+    # f.close()
+
+    with open('../app/last_update.txt', 'w') as f:
+        f.write(f'{datetime.date(datetime.now())}')
 
     

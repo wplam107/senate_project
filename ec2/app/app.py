@@ -22,6 +22,9 @@ data_df = pd.read_csv('data/sen_data.csv', index_col=0)
 with open('data/sen_info.p', 'rb') as f:
     sen_info = pickle.load(f)
 
+with open('./last_update.txt', 'r') as f:
+    last_update = f.readlines()[0]
+
 # Options
 states = list(set([ sen[5] for sen in sen_info ]))
 states.sort()
@@ -74,6 +77,7 @@ app.layout = html.Div(children=[
             ), href='https://github.com/wplam107/senate_project'
         )
     ]),
+    html.H5(f'Last Update: {last_update}'),
     dcc.Tabs([
         dcc.Tab(label='Visualization of Congress', children=[
             html.Div(children=[
